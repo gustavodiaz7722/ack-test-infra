@@ -333,8 +333,22 @@ def delete_secret(namespace: str,
     """
     _api_client = _get_k8s_api_client()
     client.CoreV1Api(_api_client).delete_namespaced_secret(name.lower(), namespace.lower())
-
+    
 def wait_on_condition(reference: CustomResourceReference,
+                      condition_name: str,
+                      desired_condition_status: str,
+                      wait_periods: int = 2,
+                      period_length: int = 60) -> bool:
+    """
+    Adapter method for wait_on_condition for new ack Ready condition
+    Maps "ACK.ResourceSynced" to "ACK.Ready"
+    """
+    if condition_name == "ACK.ResourceSynced":
+        return wait_on_condition_adapter(reference, "Ready", desired_condition_status, wait_periods, period_length)
+    return wait_on_condition_adapter(reference, condition_name, desired_condition_status, wait_periods, period_length)
+    
+
+def wait_on_condition_adapter(reference: CustomResourceReference,
                       condition_name: str,
                       desired_condition_status: str,
                       wait_periods: int = 2,
