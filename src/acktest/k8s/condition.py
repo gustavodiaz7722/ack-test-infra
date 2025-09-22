@@ -18,6 +18,7 @@ import pytest
 from . import resource
 
 CONDITION_TYPE_ADOPTED = "ACK.Adopted"
+CONDITION_TYPE_READY = "Ready"
 CONDITION_TYPE_RESOURCE_SYNCED = "ACK.ResourceSynced"
 CONDITION_TYPE_TERMINAL = "ACK.Terminal"
 CONDITION_TYPE_RECOVERABLE = "ACK.Recoverable"
@@ -136,3 +137,70 @@ def assert_not_synced(ref: resource.CustomResourceReference):
         a False status.
     """
     return assert_synced_status(ref, False)
+  
+def assert_ready_status(
+    ref: resource.CustomResourceReference,
+    cond_status_match: bool,
+):
+    """Asserts that the supplied resource has a condition of type
+    Ready and that the Status of this condition is True.
+
+    Usage:
+        from acktest.k8s import resource
+        from acktest.k8s import condition
+
+        ref = resource.CustomResourceReference(
+            CRD_GROUP, CRD_VERSION, RESOURCE_PLURAL,
+            db_cluster_id, namespace="default",
+        )
+        resource.create_custom_resource(ref, resource_data)
+        resource.wait_resource_consumed_by_controller(ref)
+        condition.assert_ready_status(ref, False)
+        
+    Raises:
+        pytest.fail when Ready condition is not found or is not in
+        a True status.
+    """
+    assert_type_status(ref, "Ready", cond_status_match)
+    
+def assert_ready(ref: resource.CustomResourceReference):
+    """Asserts that the supplied resource has a condition of type
+    Ready and that the Status of this condition is True.
+
+    Usage:
+        from acktest.k8s import resource
+        from acktest.k8s import condition
+
+        ref = resource.CustomResourceReference(
+            CRD_GROUP, CRD_VERSION, RESOURCE_PLURAL,
+            db_cluster_id, namespace="default",
+        )
+        resource.create_custom_resource(ref, resource_data)
+        resource.wait_resource_consumed_by_controller(ref)
+        condition.assert_ready(ref)
+    Raises:
+        pytest.fail when Ready condition is not found or is not in
+        a True status.
+    """
+    return assert_ready_status(ref, True)
+  
+def assert_not_ready(ref: resource.CustomResourceReference):
+    """Asserts that the supplied resource has a condition of type
+    Ready and that the Status of this condition is False.
+
+    Usage:
+        from acktest.k8s import resource
+        from acktest.k8s import condition
+
+        ref = resource.CustomResourceReference(
+            CRD_GROUP, CRD_VERSION, RESOURCE_PLURAL,
+            db_cluster_id, namespace="default",
+        )
+        resource.create_custom_resource(ref, resource_data)
+        resource.wait_resource_consumed_by_controller(ref)
+        condition.assert_not_ready(ref)
+    Raises:
+        pytest.fail when Ready condition is not found or is not in
+        a False status.
+    """
+    return assert_ready_status(ref, False)
