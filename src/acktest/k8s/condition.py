@@ -136,7 +136,7 @@ def assert_not_ready(ref: resource.CustomResourceReference):
     """
     return assert_ready_status(ref, False)
   
-def assert_terminal(ref: resource.CustomResourceReference, expected_message: str):
+def assert_terminal(ref: resource.CustomResourceReference, expected_message: str = None):
     """Asserts that the supplied resource has a condition of type
     Ready and that the Status of this condition is False. Also checks
     that the reason field contains the expected terminal reason.
@@ -156,7 +156,8 @@ def assert_terminal(ref: resource.CustomResourceReference, expected_message: str
     Raises:
         pytest.fail when Ready condition is not found or is not in
         a False status or the reason field does not contain the expected
-        terminal reason.
+        terminal reason. Also fails if the expected_message is provided
+        and is not found in the message field of the Ready condition.
         
     """
     assert_type_status(ref, "Ready", False)
@@ -169,7 +170,7 @@ def assert_terminal(ref: resource.CustomResourceReference, expected_message: str
         pytest.fail(msg)
     
     message = cond.get('message', None)
-    if expected_message not in message:
+    if expected_message and expected_message not in message:
         msg = (f"Expected Ready condition to "
                f"have message containing '{expected_message}' but found '{message}'")
         pytest.fail(msg)
