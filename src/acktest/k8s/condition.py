@@ -63,9 +63,15 @@ def assert_type_status(
         pytest.fail(msg)
 
     cond_status = cond.get('status', None)
+    cond_message = cond.get('message', None)
+    cond_reason = cond.get('reason', None)
     if str(cond_status) != str(cond_status_match):
         msg = (f"Expected {cond_type_match} condition to "
                f"have status {cond_status_match} but found {cond_status}")
+        if cond_reason:
+            msg += f", reason: {cond_reason}"
+        if cond_message:
+            msg += f", message: {cond_message}"
         pytest.fail(msg)
 
   
