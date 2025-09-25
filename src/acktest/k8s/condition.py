@@ -27,6 +27,7 @@ CONDITION_TYPE_LATE_INITIALIZED = "ACK.LateInitialized"
 CONDITION_TYPE_REFERENCES_RESOLVED = "ACK.ReferencesResolved"
 
 TERMINAL_REASON = "Terminal error, the custom resource Spec needs to be updated before any further sync can occur"
+RECOVERABLE_REASON = "Recoverable error, may be resolved without updating the custom resource spec"
 
 
 def assert_type_status(
@@ -173,6 +174,45 @@ def assert_terminal(ref: resource.CustomResourceReference, expected_message: str
     if reason != TERMINAL_REASON:
         msg = (f"Expected Ready condition to "
                f"have reason '{TERMINAL_REASON}' but found '{reason}'")
+        pytest.fail(msg)
+    
+    message = cond.get('message', None)
+    if expected_message and expected_message not in message:
+        msg = (f"Expected Ready condition to "
+               f"have message containing '{expected_message}' but found '{message}'")
+        pytest.fail(msg)
+        
+def assert_recoverable(ref: resource.CustomResourceReference, expected_message: str = None):
+    """Asserts that the supplied resource has a condition of type
+    Ready and that the Status of this condition is False. Also checks
+    that the reason field contains the expected recoverable reason.
+
+    Usage:
+        from acktest.k8s import resource
+        from acktest.k8s import condition
+
+        ref = resource.CustomResourceReference(
+            CRD_GROUP, CRD_VERSION, RESOURCE_PLURAL,
+            db_cluster_id, namespace="default",
+        )
+        resource.create_custom_resource(ref, resource_data)
+        resource.wait_resource_consumed_by_controller(ref)
+        condition.assert_recoverable(ref)
+        
+    Raises:
+        pytest.fail when Ready condition is not found or is not in
+        a False status or the reason field does not contain the expected
+        recoverable reason. Also fails if the expected_message is provided
+        and is not found in the message field of the Ready condition.
+        
+    """
+    assert_type_status(ref, "Ready", False)
+    cond = resource.get_resource_condition(ref, "Ready")
+    
+    reason = cond.get('reason', None)
+    if reason != RECOVERABLE_REASON:
+        msg = (f"Expected Ready condition to "
+               f"have reason '{RECOVERABLE_REASON}' but found '{reason}'")
         pytest.fail(msg)
     
     message = cond.get('message', None)
