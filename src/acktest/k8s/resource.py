@@ -338,7 +338,8 @@ def wait_on_condition(reference: CustomResourceReference,
                       condition_name: str,
                       desired_condition_status: str,
                       wait_periods: int = 2,
-                      period_length: int = 60) -> bool:
+                      period_length: int = 60,
+                      desired_condition_reason: str = None) -> bool:
     """
     Waits for the specified condition in .status.conditions to reach the desired value.
 
@@ -359,8 +360,9 @@ def wait_on_condition(reference: CustomResourceReference,
         logging.debug(f"Waiting on condition {condition_name} to reach {desired_condition_status} for resource {reference} ({i})")
 
         desired_condition = get_resource_condition(reference, condition_name)
-        if desired_condition is not None and desired_condition['status'] == desired_condition_status:
-            logging.info(f"Condition {condition_name} has status {desired_condition_status}, continuing...")
+        desired_reason_found = desired_condition_reason is None or desired_condition_reason in desired_condition['reason']
+        if desired_condition is not None and desired_condition['status'] == desired_condition_status and desired_reason_found:
+            logging.info(f"Condition {condition_name} has status {desired_condition_status} and reason {desired_condition_reason}, continuing...")
             return True
 
         sleep(period_length)
