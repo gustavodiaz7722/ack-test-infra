@@ -25,6 +25,7 @@ RUN echo "Installing packages ..." \
         jq \
         kmod \
         procps \
+        python3-setuptools \
         uuid-runtime \
         unzip
 
