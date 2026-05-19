@@ -25,9 +25,12 @@ RUN echo "Installing packages ..." \
         jq \
         kmod \
         procps \
+        python3-pip \
         python3-setuptools \
         uuid-runtime \
         unzip
+
+RUN pip install --break-system-packages setuptools
 
 RUN echo "Installing yq ..." \
     && export BINARY=yq_linux_amd64 \
