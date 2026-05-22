@@ -137,7 +137,7 @@ spec:
         "Statement": [
           {
             "Effect": "Allow",
-            "Action": ["sts:AssumeRole"],
+            "Action": ["sts:AssumeRole", "sts:TagSession"],
             "Resource": "arn:aws:iam::${PUBLISH_ACCOUNT_ID}:role/*"
           }
         ]
