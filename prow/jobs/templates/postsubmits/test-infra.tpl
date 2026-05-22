@@ -1,4 +1,4 @@
-  ${TEST_INFRA_ORG}/test-infra:
+  ${TEST_INFRA_ORG}/${TEST_INFRA_REPO}:
   - name: build-prow-images
     decorate: true
     run_if_changed: ^(prow\/.*\/images_config.yaml)
