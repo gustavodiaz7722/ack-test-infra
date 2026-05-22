@@ -93,7 +93,7 @@ resource "aws_iam_role" "artifact_reader" {
     Statement = [{
       Effect    = "Allow"
       Principal = { AWS = "arn:${local.partition}:iam::${local.account_id}:root" }
-      Action    = "sts:AssumeRole"
+      Action    = ["sts:AssumeRole", "sts:TagSession"]
     }]
   })
 }
@@ -122,7 +122,7 @@ resource "aws_iam_role" "artifact_writer" {
     Statement = [{
       Effect    = "Allow"
       Principal = { AWS = "arn:${local.partition}:iam::${local.account_id}:root" }
-      Action    = "sts:AssumeRole"
+      Action    = ["sts:AssumeRole", "sts:TagSession"]
     }]
   })
 }
@@ -173,7 +173,7 @@ resource "aws_iam_role" "publish_prow_images" {
     Statement = [{
       Effect    = "Allow"
       Principal = { AWS = "arn:${local.partition}:iam::${local.account_id}:root" }
-      Action    = "sts:AssumeRole"
+      Action    = ["sts:AssumeRole", "sts:TagSession"]
     }]
   })
 }

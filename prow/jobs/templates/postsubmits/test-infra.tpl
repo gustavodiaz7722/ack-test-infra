@@ -22,5 +22,7 @@
               cpu: 2
               memory: "4096Mi"
           command: ["./prow/jobs/tools/cmd/build-prow-images.sh"]
+          securityContext:
+            privileged: true
     branches:
     - ${TEST_INFRA_BRANCH}                
