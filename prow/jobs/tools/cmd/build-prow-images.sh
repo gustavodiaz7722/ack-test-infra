@@ -102,5 +102,7 @@ if [ -n "$BUILT_JOB_TAGS" ] || [ -n "$BUILT_AGENT_WORKFLOW_TAGS" ] || [ -n "$BUI
   --subject "Patch Prow Image Versions" \
   --description "$PR_DESCRIPTION" \
   --commit-branch "ack-bot/built-and-pushed-images-$(date +%N)" \
+  --source-owner "$TEST_INFRA_ORG" \
+  --source-repo "$REPO_NAME" \
   --source-files $SOURCE_FILES
 fi
