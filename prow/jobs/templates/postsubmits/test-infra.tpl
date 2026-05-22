@@ -20,4 +20,4 @@
               memory: "4096Mi"
           command: ["./prow/jobs/tools/cmd/build-prow-images.sh"]
     branches:
-    - main                
+    - ${TEST_INFRA_BRANCH}                
