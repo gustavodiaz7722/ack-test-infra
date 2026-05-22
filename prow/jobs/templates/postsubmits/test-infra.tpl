@@ -11,6 +11,9 @@
       serviceAccountName: post-submit-service-account
       containers:
         - image: {{printf "%s:%s" $.ImageContext.ImageRepo (index $.ImageContext.Images "build-prow-images") }}
+          env:
+          - name: PROW_IMAGES_REPO_URI
+            value: {{$.ImageContext.ImageRepo}}
           resources:
             limits:
               cpu: 2

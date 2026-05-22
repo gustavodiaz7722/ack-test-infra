@@ -13,10 +13,9 @@ fi
 export PROW_ECR_PUBLISH_ARN
 echo "build-prow-images.sh] [SETUP] exported PROW_ECR_PUBLISH_ARN"
 
-ASSUME_COMMAND=$(aws sts assume-role-with-web-identity \
+ASSUME_COMMAND=$(aws sts assume-role \
     --role-arn $PROW_ECR_PUBLISH_ARN \
-    --role-session-name "WebIdentitySession" \
-    --web-identity-token "$(cat $AWS_WEB_IDENTITY_TOKEN_FILE)" \
+    --role-session-name "build-prow-images" \
     --output json \
     --duration-seconds 3600 \
     | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')
@@ -25,13 +24,22 @@ echo "build-prow-images.sh] [SETUP] Assumed PROW_ECR_PUBLISH_ARN"
 
 buildah_login
 
+# Derive the ECR repository name from PROW_IMAGES_REPO_URI
+# e.g. public.ecr.aws/x1y2z3/ack-test-infra-dev-prow-images -> ack-test-infra-dev-prow-images
+PROW_ECR_REPO_NAME="${PROW_IMAGES_REPO_URI##*/}"
+if [ -z "$PROW_ECR_REPO_NAME" ]; then
+  echo "build-prow-images.sh] [ERROR] Could not derive repo name from PROW_IMAGES_REPO_URI=$PROW_IMAGES_REPO_URI"
+  exit 1
+fi
+echo "build-prow-images.sh] [SETUP] Using ECR repo: $PROW_ECR_REPO_NAME"
+
 # Build Prow Jobs
 BUILT_JOB_TAGS=$(ack-build-tools build-prow-images \
   --images-config-path ./prow/jobs/images_config.yaml \
   --jobs-config-path ./prow/jobs/jobs_config.yaml \
   --jobs-templates-path ./prow/jobs/templates/ \
   --jobs-output-path ./prow/jobs/jobs.yaml \
-  --prow-ecr-repository prow)
+  --prow-ecr-repository "$PROW_ECR_REPO_NAME")
 
 if [ $? -ne 0 ]; then
   echo "Error building prow jobs"
@@ -41,7 +49,7 @@ fi
 # Build Prow Agent Workflows
 BUILT_AGENT_WORKFLOW_TAGS=$(ack-build-tools build-prow-agent-workflow-images \
   --images-config-path ./prow/agent-workflows/images_config.yaml \
-  --prow-ecr-repository prow \
+  --prow-ecr-repository "$PROW_ECR_REPO_NAME" \
   --agent-workflows-templates-path ./prow/agent-workflows/templates \
   --agent-workflows-output-path ./prow/agent-workflows/agent-workflows.yaml)
 
@@ -53,7 +61,7 @@ fi
 # Build Prow Plugins
 BUILT_PLUGIN_TAGS=$(ack-build-tools build-prow-plugin-images \
   --images-config-path ./prow/plugins/images_config.yaml \
-  --prow-ecr-repository prow)
+  --prow-ecr-repository "$PROW_ECR_REPO_NAME")
 
 if [ $? -ne 0 ]; then
   echo "Error building prow plugins"
