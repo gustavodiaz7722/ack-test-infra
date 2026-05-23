@@ -65,7 +65,7 @@ _assume_publisher_role() {
 
     local ecr_pw
     ecr_pw=$(aws ecr-public get-login-password --region us-east-1)
-    echo "$ecr_pw" | $CONTAINER_BUILDER login -u AWS --password-stdin public.ecr.aws
+    echo "$ecr_pw" | BUILDAH_ISOLATION=chroot $CONTAINER_BUILDER login -u AWS --password-stdin public.ecr.aws
     echo "$ecr_pw" | HELM_EXPERIMENTAL_OCI=1 helm registry login --username AWS --password-stdin public.ecr.aws
 }
 
