@@ -177,15 +177,9 @@ data:
           - name: TEST_INFRA_ORG
             value: {{ .Values.github.organisation | required "github.organisation is required" | quote }}
           - name: KUBERNETES_ORG
-            valueFrom:
-              configMapKeyRef:
-                name: self-managed-vars
-                key: KUBERNETES_ORG
+            value: {{ .Values.kubernetesOrg | required "kubernetesOrg is required" | quote }}
           - name: REDHAT_ORG
-            valueFrom:
-              configMapKeyRef:
-                name: self-managed-vars
-                key: REDHAT_ORG
+            value: {{ .Values.redhatOrg | required "redhatOrg is required" | quote }}
         volumes:
           - name: github-token
             csi:
