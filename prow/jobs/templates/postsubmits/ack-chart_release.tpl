@@ -1,6 +1,7 @@
   ${TEST_INFRA_ORG}/ack-chart:
   - name: ack-chart-release
     decorate: true
+    path_alias: github.com/aws-controllers-k8s/ack-chart
     annotations:
       # karpenter.sh/do-not-evict is deprecated: https://github.com/aws/karpenter-provider-aws/issues/5394
     karpenter.sh/do-not-disrupt: "true"
