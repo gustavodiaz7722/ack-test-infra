@@ -153,6 +153,7 @@ Image sources:
 ```bash
 terraform apply -var-file=environment/dev.tfvars
 ```
+test
 
 ## Day-2 Infrastructure Changes (ACK Manifests)
 
