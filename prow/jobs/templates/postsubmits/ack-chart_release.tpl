@@ -15,6 +15,8 @@
       path_alias: github.com/aws-controllers-k8s/test-infra
     spec:
       serviceAccountName: post-submit-service-account
+      securityContext:
+        runAsUser: 0
       containers:
         - image: {{printf "%s:%s" $.ImageContext.ImageRepo (index $.ImageContext.Images "deploy") }}
           resources:
